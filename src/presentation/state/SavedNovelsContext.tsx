@@ -1,7 +1,11 @@
 "use client";
 
-import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import React, { createContext, useContext, useCallback } from 'react';
+import { useLocalStorage } from '../hooks/utils/useLocalStorage';
+import { Novel } from '../../core/entities/Novel';
 
+// On utilise un type dérivé de Novel pour correspondre à l'ancienne interface, 
+// ou on adapte pour utiliser directement l'entité Novel.
 export interface SavedNovel {
     url: string;
     title: string;
@@ -22,44 +26,29 @@ const SavedNovelsContext = createContext<SavedNovelsContextType | undefined>(und
 const SAVED_NOVELS_KEY = 'litverse_saved_novels';
 
 export function SavedNovelsProvider({ children }: { children: React.ReactNode }) {
-    const [savedNovels, setSavedNovels] = useState<SavedNovel[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
-
-    useEffect(() => {
-        const stored = localStorage.getItem(SAVED_NOVELS_KEY);
-        if (stored) {
-            try {
-                setSavedNovels(JSON.parse(stored));
-            } catch (e) {
-                console.error("Failed to parse saved novels", e);
-            }
-        }
-        setIsLoading(false);
-    }, []);
+    const {
+        storedValue: savedNovels,
+        setValue: setSavedNovels,
+        isInitialized
+    } = useLocalStorage<SavedNovel[]>(SAVED_NOVELS_KEY, []);
 
     const addNovel = useCallback((novel: Omit<SavedNovel, 'addedAt'>) => {
         setSavedNovels(prev => {
             if (prev.some(n => n.url === novel.url)) return prev;
-            const updated = [{ ...novel, addedAt: Date.now() }, ...prev];
-            localStorage.setItem(SAVED_NOVELS_KEY, JSON.stringify(updated));
-            return updated;
+            return [{ ...novel, addedAt: Date.now() }, ...prev];
         });
-    }, []);
+    }, [setSavedNovels]);
 
     const removeNovel = useCallback((url: string) => {
-        setSavedNovels(prev => {
-            const updated = prev.filter(n => n.url !== url);
-            localStorage.setItem(SAVED_NOVELS_KEY, JSON.stringify(updated));
-            return updated;
-        });
-    }, []);
+        setSavedNovels(prev => prev.filter(n => n.url !== url));
+    }, [setSavedNovels]);
 
     const isSaved = useCallback((url: string) => {
         return savedNovels.some(n => n.url === url);
     }, [savedNovels]);
 
     return (
-        <SavedNovelsContext.Provider value={{ savedNovels, addNovel, removeNovel, isSaved, isLoading }}>
+        <SavedNovelsContext.Provider value={{ savedNovels, addNovel, removeNovel, isSaved, isLoading: !isInitialized }}>
             {children}
         </SavedNovelsContext.Provider>
     );

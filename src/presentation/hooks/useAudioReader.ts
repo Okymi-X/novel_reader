@@ -21,13 +21,26 @@ export function useAudioReader(paragraphs: Paragraph[]) {
 
         const loadVoices = () => {
             const available = window.speechSynthesis.getVoices();
-            setVoices(available);
 
-            if (!selectedVoice) {
-                const frVoice = available.find(v => v.name.includes("Google") && v.lang.startsWith("fr"))
-                    || available.find(v => v.lang.startsWith("fr"))
-                    || available[0];
-                if (frVoice) setSelectedVoice(frVoice);
+            // 1. Filtrer pour ne garder que le Français
+            const frVoices = available.filter(v => v.lang.startsWith("fr"));
+
+            // 2. Trier pour mettre les voix Premium en premier (Google Online, Microsoft Natural, Apple Enhanced)
+            const sortedVoices = [...frVoices].sort((a, b) => {
+                const aIsPremium = a.name.includes("Natural") || a.name.includes("Online") || a.name.includes("Enhanced") || a.name.includes("Premium");
+                const bIsPremium = b.name.includes("Natural") || b.name.includes("Online") || b.name.includes("Enhanced") || b.name.includes("Premium");
+                if (aIsPremium && !bIsPremium) return -1;
+                if (!aIsPremium && bIsPremium) return 1;
+                return 0;
+            });
+
+            // S'il n'y a pas de voix FR, on fallback sur toutes les voix dispo (sorted)
+            const finalVoices = sortedVoices.length > 0 ? sortedVoices : available;
+            setVoices(finalVoices);
+
+            if (!selectedVoice && finalVoices.length > 0) {
+                // Le premier élément de sortedVoices est garanti d'être la meilleure voix disponible
+                setSelectedVoice(finalVoices[0]);
             }
         };
 

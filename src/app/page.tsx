@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useReadingProgress } from "@/hooks/useReadingProgress";
+import { useReadingProgress } from "@/presentation/hooks/useReadingProgress";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { BookOpen, Clock, Sparkles, ChevronRight, Play, Star, TrendingUp, Grid, List, Search as SearchIcon } from "lucide-react";
@@ -44,7 +44,7 @@ export default function Home() {
   }
 
   return (
-    <div className="flex-1 overflow-y-auto bg-background p-6 md:p-10 animate-fade-in">
+    <div className="flex-1 overflow-y-auto bg-background p-6 md:p-10 pb-28 md:pb-10 animate-fade-in">
       {/* Header */}
       <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
         <div>
@@ -67,7 +67,7 @@ export default function Home() {
       </header>
 
       {/* Bento Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 pb-20">
+      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
 
         {/* Main Continue Reading Card - Spans 2 cols, 2 rows */}
         {lastRead ? (

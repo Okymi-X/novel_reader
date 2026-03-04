@@ -1,4 +1,4 @@
-import { fetchChapter } from '@/lib/scraper';
+import { getChapterUseCase } from '@/infrastructure/di';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(request: NextRequest) {
@@ -10,9 +10,10 @@ export async function GET(request: NextRequest) {
     }
 
     try {
-        const chapter = await fetchChapter(url);
+        const chapter = await getChapterUseCase.execute(url);
         return NextResponse.json(chapter);
     } catch (error) {
+        console.error("Error in GET /api/novel:", error);
         return NextResponse.json({ error: 'Failed to fetch chapter' }, { status: 500 });
     }
 }

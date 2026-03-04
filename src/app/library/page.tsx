@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useReadingProgress } from "@/hooks/useReadingProgress";
-import { useSavedNovels } from "@/contexts/SavedNovelsContext";
+import { useReadingProgress } from "@/presentation/hooks/useReadingProgress";
+import { useSavedNovels } from "@/presentation/state/SavedNovelsContext";
 import { BookOpen, Clock, ChevronRight, Play, Bookmark, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
@@ -23,7 +23,7 @@ export default function LibraryPage() {
     }
 
     return (
-        <div className="flex-1 overflow-y-auto bg-background p-6 md:p-10 animate-fade-in flex flex-col">
+        <div className="flex-1 overflow-y-auto bg-background p-6 md:p-10 pb-28 md:pb-10 animate-fade-in flex flex-col">
             <header className="mb-8">
                 <h1 className="text-4xl md:text-5xl font-serif font-bold text-foreground mb-2">Ma Bibliothèque</h1>
                 <p className="text-foreground/60 text-lg">Gérez vos lectures en cours et votre collection.</p>

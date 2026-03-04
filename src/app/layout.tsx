@@ -2,10 +2,12 @@ import type { Metadata } from "next";
 import { Inter, Merriweather } from "next/font/google";
 import "./globals.css";
 import { Sidebar } from "@/components/Sidebar";
-import { ReadingProgressProvider } from "@/contexts/ReadingProgressContext";
-import { SettingsProvider } from "@/contexts/SettingsContext";
-import { SavedNovelsProvider } from "@/contexts/SavedNovelsContext";
-import { ToastProvider } from "@/contexts/ToastContext";
+import { ReadingProgressProvider } from "@/presentation/state/ReadingProgressContext";
+import { SettingsProvider } from "@/presentation/state/SettingsContext";
+import { SavedNovelsProvider } from "@/presentation/state/SavedNovelsContext";
+import { ToastProvider } from "@/presentation/state/ToastContext";
+
+import { MobileBottomNav } from "@/components/MobileBottomNav";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 const merriweather = Merriweather({
@@ -35,6 +37,7 @@ export default function RootLayout({
                 <main className="flex-1 overflow-hidden relative flex flex-col md:ml-72 transition-all duration-300">
                   {children}
                 </main>
+                <MobileBottomNav />
               </ReadingProgressProvider>
             </SavedNovelsProvider>
           </SettingsProvider>

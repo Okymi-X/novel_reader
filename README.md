@@ -1,36 +1,77 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+<div align="center">
+  <img src="https://img.shields.io/badge/Next.js-14-black.svg?style=for-the-badge&logo=next.js" alt="Next.js" />
+  <img src="https://img.shields.io/badge/TypeScript-007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
+  <img src="https://img.shields.io/badge/Tailwind_CSS-38B2AC.svg?style=for-the-badge&logo=tailwind-css&logoColor=white" alt="Tailwind CSS" />
+  
+  <br />
+  <br />
+  
+  <h1>📖 Novel Reader</h1>
+  <p>
+    Une application web open-source moderne de lecture et d'écoute de romans web (Light Novels, Webnovels).<br/>
+    Créée par <strong>Okymi-X</strong> pour les passionnés de lecture.
+  </p>
+  
+  <strong>[ <a href="#déploiement-sur-vercel">Déployer sur Vercel</a> ]</strong>
+</div>
 
-## Getting Started
+---
 
-First, run the development server:
+## ✨ Fonctionnalités Principales
+
+* **🎧 Smart Audio TTS (Voix Réalistes) :** Le lecteur intègre un moteur intelligent qui déverrouille et force l'utilisation des "Voix Premium / Neuronales" natives (Google Online, Siri, Microsoft Natural) cachées dans le système de l'utilisateur, offrant un résultat ultra-réaliste **gratuitement et sans API externe**.
+* **📱 Interface Native UI :** Navigation pensée pour mobile avec un Bottom Navigation Bar translucide (façon iOS) et une expérience PWA parfaite.
+* **⚡ Clean Architecture :** Le projet est rigoureusement structuré sous les préceptes de la Clean Architecture (Domaine, Infrastructures, Use Cases) assurant une maintenabilité exceptionnelle et facilitant l'intégration de nouveaux parsers.
+* **🎨 Thèmes Visuels :** Personnalisation complète (Papier, Clair, Sombre, Sépia) et contrôles typographiques complets (Sans-Serif/Serif, taille du texte dynamique).
+* **📚 Scraping en Temps Réel :** Parsing dynamique intelligent du contenu du chapitre cible et prédiction de la pagination suivante, capable de piocher sa base sur des sites partenaires supportés de façon fluide et optimisée.
+* **💾 Hors-ligne & Historique :** Sauvegarde locale persistante des romans ajoutés à la "Bibliothèque" et enregistrement automatique des derniers chapitres lus.
+
+## 🛠️ Installation en Local
+
+Pour contribuer ou utiliser ce lecteur en local sur votre machine :
 
 ```bash
+# 1. Cloner le projet
+git clone https://github.com/Okymi-X/novel-reader.git
+cd novel-reader
+
+# 2. Installer les dépendances
+npm install
+# ou yarn install / pnpm install
+
+# 3. Lancer le serveur de développement
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Ouvrez [http://localhost:3000](http://localhost:3000) et profitez de la lecture !
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🚀 Déploiement sur Vercel
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Le projet `Novel Reader` est propulsé par **Next.js**, il est donc extrêmement optimisé pour être déployé gratuitement et en un clic sur Vercel. 
 
-## Learn More
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FOkymi-X%2Fnovel-reader)
 
-To learn more about Next.js, take a look at the following resources:
+### Étapes manuelles :
+1. Poussez (*Push*) ce code sur votre propre repository GitHub public ou privé.
+2. Allez sur **[Vercel.com](https://vercel.com/)** et connectez-vous avec GitHub.
+3. Cliquez sur **Add New...** > **Project** et sélectionnez votre dépôt GitHub *novel-reader*.
+4. Cliquez sur **Deploy** et patientez 1 minute.
+5. C'est fait ! Votre application est en ligne et hébergée gratuitement, prête à être ajoutée à l'écran d'accueil de votre téléphone !
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🏗️ Architecture Technique (Clean Architecture)
+```
+src/
+ ├── domain/             # (Business Rules) Entités métiers (Novel, Paragraph)
+ ├── _useCases/          # (Application Business Rules) ex: FetchChapterData()
+ ├── infrastructure/     # (Frameworks & Drivers) Récupération & DOM Parsing, Axios...
+ │   └── parsers/        # Stratégies d'extraction de contenu (HtmlParser, GenericParser)
+ ├── presentation/       # (UI & Controllers) Hooks, State (Context), Tailwind styles
+ ├── components/         # Composants React modulaires
+ └── app/                # Next.js App Router (Pages principales)
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## ❤️ Contribuer
+Les contributions (Pull Requests) sont grandement appréciées, notamment si vous souhaitez ajouter de nouvelles stratégies logicielle dans `/infrastructure` ou de nouveaux Scraping Parsers pour intégrer le support de nouveaux sites de lecture !
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+*Créé avec passion par **Okymi-X** et rendu open-source pour la communauté littéraire du web.*

@@ -6,8 +6,8 @@ import Link from 'next/link';
 import { Loader2, BookOpen, Calendar, ChevronRight, BookmarkPlus, BookmarkCheck } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useSearchParams } from 'next/navigation';
-import { useSavedNovels } from '@/contexts/SavedNovelsContext';
-import { useToast } from '@/contexts/ToastContext';
+import { useSavedNovels } from '@/presentation/state/SavedNovelsContext';
+import { useToast } from '@/presentation/state/ToastContext';
 
 function NovelDetailsContent() {
     const searchParams = useSearchParams();
@@ -75,59 +75,61 @@ function NovelDetailsContent() {
     return (
         <div className="h-full overflow-y-auto bg-background scrollbar-hide">
             {/* Immersive Hero Section */}
-            <div className="relative h-[50vh] min-h-[400px] overflow-hidden">
-                <div className="absolute inset-0 bg-foreground"></div>
-                {/* Abstract Background Art */}
-                <div className="absolute inset-0 opacity-60" style={{ backgroundImage: 'radial-gradient(circle at 50% 120%, #FF6B35 0%, transparent 70%)' }}></div>
+            <div className="relative bg-foreground w-full border-b border-border/10">
+                {/* Background Art */}
+                <div className="absolute inset-0 opacity-40 md:opacity-60" style={{ backgroundImage: 'radial-gradient(circle at 50% 0%, #FF6B35 0%, transparent 70%)' }}></div>
                 <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
+                {/* Gradient to smooth out the bottom transition */}
+                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/40 to-background"></div>
 
-                <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-black/30"></div>
+                {/* Content */}
+                <div className="relative z-20 max-w-7xl mx-auto px-6 md:px-12 pt-12 md:pt-24 pb-12 flex flex-col md:flex-row items-center md:items-end gap-6 md:gap-10">
 
-                <div className="absolute bottom-0 left-0 right-0 p-6 md:p-12 z-20 max-w-7xl mx-auto flex flex-col md:flex-row items-end gap-8 translate-y-12 md:translate-y-16">
-                    {/* Floating Cover */}
-                    <div className="w-32 md:w-56 shrink-0 rounded-xl shadow-2xl overflow-hidden border-2 border-white/20 transform hover:scale-105 transition-transform duration-500 relative group bg-stone-900">
+                    {/* Cover Art */}
+                    <div className="w-40 sm:w-48 md:w-60 shrink-0 rounded-2xl shadow-2xl overflow-hidden border-4 border-background/20 bg-stone-900 group">
                         {novel.cover ? (
-                            <img src={novel.cover} alt={novel.title} className="w-full h-auto aspect-[2/3] object-cover" />
+                            <img src={novel.cover} alt={novel.title} className="w-full h-auto aspect-[2/3] object-cover transition-transform duration-700 group-hover:scale-105" />
                         ) : (
                             <div className="w-full aspect-[2/3] flex items-center justify-center text-white/20">
                                 <BookOpen className="w-16 h-16" />
                             </div>
                         )}
-                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors"></div>
                     </div>
 
                     {/* Meta Info */}
-                    <div className="mb-16 md:mb-20 flex-1">
-                        <div className="flex flex-wrap gap-2 mb-4">
-                            <span className="px-3 py-1 bg-primary text-white rounded-full text-xs font-bold uppercase tracking-wider shadow-lg shadow-primary/20">
+                    <div className="flex-1 flex flex-col items-center md:items-start text-center md:text-left w-full pt-2 md:pt-0">
+                        <div className="flex flex-wrap justify-center md:justify-start gap-2 mb-4">
+                            <span className="px-3 py-1 bg-primary text-white rounded-full text-[10px] font-bold uppercase tracking-widest shadow-lg shadow-primary/20">
                                 {novel.status || "En cours"}
                             </span>
-                            <span className="px-3 py-1 bg-white/20 backdrop-blur-md text-white border border-white/20 rounded-full text-xs font-bold uppercase tracking-wider">Fantastique</span>
+                            <span className="px-3 py-1 bg-foreground/5 backdrop-blur-md text-foreground/80 border border-foreground/10 rounded-full text-[10px] font-bold uppercase tracking-widest">
+                                Fantastique
+                            </span>
                         </div>
-                        <h1 className="text-4xl md:text-6xl font-serif font-bold mb-4 text-foreground md:text-white leading-tight drop-shadow-sm">{novel.title}</h1>
-                        <p className="text-foreground/70 md:text-white/80 text-lg font-medium flex items-center gap-2">
+
+                        <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-serif font-bold mb-3 md:mb-5 text-foreground leading-[1.1]">{novel.title}</h1>
+
+                        <p className="text-foreground/70 text-base md:text-lg font-medium flex items-center gap-2 mb-8 md:mb-10">
                             <span className="opacity-60">Par</span>
-                            <span className="font-bold border-b border-primary pb-0.5">{novel.author || "Inconnu"}</span>
+                            <span className="font-bold border-b-2 border-primary/30 pb-0.5">{novel.author || "Inconnu"}</span>
                         </p>
 
-                        <div className="mt-6 flex flex-wrap gap-4">
-                            <button
-                                onClick={handleToggleSave}
-                                className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all shadow-sm ${saved
-                                    ? 'bg-background text-foreground hover:bg-background/90'
-                                    : 'bg-primary text-primary-foreground hover:bg-primary/90 shadow-primary/20'
-                                    }`}
-                            >
-                                {saved ? <BookmarkCheck className="w-5 h-5" /> : <BookmarkPlus className="w-5 h-5" />}
-                                <span>{saved ? 'Dans la bibliothèque' : 'Ajouter à la bibliothèque'}</span>
-                            </button>
-                        </div>
+                        <button
+                            onClick={handleToggleSave}
+                            className={`flex items-center justify-center gap-3 px-6 py-4 rounded-2xl font-bold transition-all w-full sm:w-auto text-sm md:text-base ${saved
+                                ? 'bg-foreground text-background hover:bg-foreground/90 shadow-lg'
+                                : 'bg-primary text-primary-foreground hover:bg-primary/90 shadow-xl shadow-primary/20 hover:-translate-y-0.5'
+                                }`}
+                        >
+                            {saved ? <BookmarkCheck className="w-5 h-5 md:w-6 md:h-6" /> : <BookmarkPlus className="w-5 h-5 md:w-6 md:h-6" />}
+                            <span>{saved ? 'Dans la bibliothèque' : 'Ajouter à la bibliothèque'}</span>
+                        </button>
                     </div>
                 </div>
             </div>
 
             {/* Content Area */}
-            <div className="max-w-7xl mx-auto px-6 md:px-12 pt-20 md:pt-24 pb-32">
+            <div className="max-w-7xl mx-auto px-6 md:px-12 pt-8 md:pt-16 pb-32">
 
                 {/* Stats Grid - Bento Style */}
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-16">
@@ -165,7 +167,7 @@ function ChapterList({ volumes }: { volumes: { title: string, chapters: { title:
     // Flatten chapters for easier pagination handles
     const allChapters = volumes.reduce((acc, vol) => {
         return [...acc, ...vol.chapters.map(c => ({ ...c, volumeTitle: vol.title }))];
-    }, [] as Array<{ title: string, url: string, date?: string, volumeTitle: string }>).reverse();
+    }, [] as Array<{ title: string, url: string, date?: string, volumeTitle: string }>);
 
     const [selectedRange, setSelectedRange] = useState(0);
     const CHUNK_SIZE = 100;

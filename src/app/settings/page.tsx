@@ -1,6 +1,6 @@
 "use client";
 
-import { useAppSettings } from "@/contexts/SettingsContext";
+import { useAppSettings } from "@/presentation/state/SettingsContext";
 import { Settings2, Type, MonitorSmartphone, Volume2, Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -19,7 +19,7 @@ export default function SettingsPage() {
     const speeds = [0.75, 1, 1.25, 1.5, 2];
 
     return (
-        <div className="flex-1 overflow-y-auto bg-background p-6 md:p-10 animate-fade-in text-foreground">
+        <div className="flex-1 overflow-y-auto bg-background p-6 md:p-10 pb-28 md:pb-10 animate-fade-in text-foreground">
             <header className="mb-12">
                 <h1 className="text-4xl md:text-5xl font-serif font-bold mb-2">Paramètres</h1>
                 <p className="text-foreground/60 text-lg">Personnalisez votre expérience de lecture.</p>

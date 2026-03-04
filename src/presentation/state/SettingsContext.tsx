@@ -1,6 +1,7 @@
 "use client";
 
-import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import React, { createContext, useContext, useCallback } from 'react';
+import { useLocalStorage } from '../hooks/utils/useLocalStorage';
 
 export interface AppSettings {
     theme: 'paper' | 'light' | 'dark' | 'sepia';
@@ -30,35 +31,18 @@ const SettingsContext = createContext<SettingsContextType | undefined>(undefined
 const SETTINGS_KEY = 'litverse_settings';
 
 export function SettingsProvider({ children }: { children: React.ReactNode }) {
-    const [settings, setSettings] = useState<AppSettings>(defaultSettings);
-    const [isLoading, setIsLoading] = useState(true);
-
-    useEffect(() => {
-        const stored = localStorage.getItem(SETTINGS_KEY);
-        if (stored) {
-            try {
-                setSettings({ ...defaultSettings, ...JSON.parse(stored) });
-            } catch (e) {
-                console.error("Failed to parse settings", e);
-            }
-        }
-        setIsLoading(false);
-    }, []);
+    const {
+        storedValue: settings,
+        setValue: setSettings,
+        isInitialized
+    } = useLocalStorage<AppSettings>(SETTINGS_KEY, defaultSettings);
 
     const updateSettings = useCallback((newSettings: Partial<AppSettings>) => {
-        setSettings(prev => {
-            const updated = { ...prev, ...newSettings };
-            try {
-                localStorage.setItem(SETTINGS_KEY, JSON.stringify(updated));
-            } catch (e) {
-                console.error("Failed to save settings", e);
-            }
-            return updated;
-        });
-    }, []);
+        setSettings((prev) => ({ ...prev, ...newSettings }));
+    }, [setSettings]);
 
     return (
-        <SettingsContext.Provider value={{ settings, updateSettings, isLoading }}>
+        <SettingsContext.Provider value={{ settings, updateSettings, isLoading: !isInitialized }}>
             {children}
         </SettingsContext.Provider>
     );
