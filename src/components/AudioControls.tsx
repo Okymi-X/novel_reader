@@ -115,7 +115,7 @@ export function AudioControls({
                                 </h4>
                                 <p className="text-[11px] text-stone-400 dark:text-stone-500 truncate flex items-center gap-1">
                                     {provider === 'elevenlabs' && (
-                                        <span className="inline-flex items-center justify-center w-3 h-3 rounded bg-violet-500 text-[8px] text-white font-bold">AI</span>
+                                        <span className="inline-flex items-center justify-center w-3 h-3 rounded bg-primary text-[8px] text-white font-bold">AI</span>
                                     )}
                                     {currentVoiceName} · {rate}x · §{currentParagraph + 1}/{totalParagraphs}
                                 </p>
@@ -144,25 +144,18 @@ export function AudioControls({
                                 disabled={isLoading}
                                 className={cn(
                                     "relative w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg transition-all duration-300 active:scale-90 hover:scale-105",
-                                    provider === 'elevenlabs' ? "bg-violet-500" : "bg-primary",
+                                    "bg-primary",
                                     "text-white disabled:opacity-70"
                                 )}
                                 style={{
                                     boxShadow: isPlaying
-                                        ? provider === 'elevenlabs'
-                                            ? '0 4px 20px rgba(139, 92, 246, 0.5), 0 0 60px rgba(139, 92, 246, 0.15)'
-                                            : '0 4px 20px color-mix(in srgb, var(--primary) 50%, transparent), 0 0 60px color-mix(in srgb, var(--primary) 15%, transparent)'
-                                        : provider === 'elevenlabs'
-                                            ? '0 4px 16px rgba(139, 92, 246, 0.3)'
-                                            : '0 4px 16px color-mix(in srgb, var(--primary) 30%, transparent)',
+                                        ? '0 4px 20px color-mix(in srgb, var(--primary) 50%, transparent), 0 0 60px color-mix(in srgb, var(--primary) 15%, transparent)'
+                                        : '0 4px 16px color-mix(in srgb, var(--primary) 30%, transparent)',
                                 }}
                             >
                                 {isPlaying && !isLoading && (
                                     <motion.div
-                                        className={cn(
-                                            "absolute inset-0 rounded-2xl border-2",
-                                            provider === 'elevenlabs' ? "border-violet-500" : "border-primary"
-                                        )}
+                                        className="absolute inset-0 rounded-2xl border-2 border-primary"
                                         animate={{ scale: [1, 1.2], opacity: [0.6, 0] }}
                                         transition={{ repeat: Infinity, duration: 1.5, ease: 'easeOut' }}
                                     />
@@ -199,9 +192,7 @@ export function AudioControls({
                                 }}
                                 className={cn(
                                     "hidden md:flex items-center justify-center px-2.5 py-1 rounded-lg text-[11px] font-bold font-mono transition-all",
-                                    provider === 'elevenlabs'
-                                        ? "text-violet-600 dark:text-violet-400 bg-violet-100 dark:bg-violet-900/30 hover:bg-violet-200 dark:hover:bg-violet-900/50"
-                                        : "text-stone-500 dark:text-stone-400 bg-stone-100 dark:bg-stone-800 hover:bg-stone-200 dark:hover:bg-stone-700"
+                                    "text-stone-500 dark:text-stone-400 bg-stone-100 dark:bg-stone-800 hover:bg-stone-200 dark:hover:bg-stone-700"
                                 )}
                             >
                                 {rate}×

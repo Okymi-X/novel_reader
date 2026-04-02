@@ -203,15 +203,21 @@ export function useElevenLabsReader(paragraphs: Paragraph[]): UseElevenLabsReade
             return;
         }
 
-        setIsLoading(true);
+        const options = {
+            voiceId: selectedElevenLabsVoice.voice_id,
+            stability,
+            similarityBoost,
+        };
+
+        // Check if already cached (from prefetch)
+        const isCached = elevenLabsService.isAudioCached(text, options);
+        if (!isCached) {
+            setIsLoading(true);
+        }
         setError(null);
 
         try {
-            const audioUrl = await elevenLabsService.generateAudio(text, {
-                voiceId: selectedElevenLabsVoice.voice_id,
-                stability,
-                similarityBoost,
-            });
+            const audioUrl = await elevenLabsService.generateAudio(text, options);
 
             if (isCancelledRef.current) return;
 
@@ -243,6 +249,21 @@ export function useElevenLabsReader(paragraphs: Paragraph[]): UseElevenLabsReade
             setIsLoading(false);
         }
     }, [selectedElevenLabsVoice, stability, similarityBoost, rate]);
+
+    // Prefetch upcoming paragraphs when index changes
+    useEffect(() => {
+        if (provider === 'elevenlabs' && isElevenLabsAvailable && selectedElevenLabsVoice && isPlaying) {
+            elevenLabsService.prefetchParagraphs(
+                paragraphs,
+                currentIndex,
+                {
+                    voiceId: selectedElevenLabsVoice.voice_id,
+                    stability,
+                    similarityBoost,
+                }
+            );
+        }
+    }, [currentIndex, provider, isElevenLabsAvailable, selectedElevenLabsVoice, stability, similarityBoost, paragraphs, isPlaying]);
 
     // Speak paragraph
     const speakParagraph = useCallback((index: number) => {

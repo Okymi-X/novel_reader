@@ -89,7 +89,7 @@ export function SettingsModal({
                             {/* TTS Provider Selection */}
                             <div className="space-y-4">
                                 <div className="flex items-center gap-2">
-                                    <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-violet-500 to-violet-600 flex items-center justify-center">
+                                    <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center">
                                         <Sparkles className="w-3.5 h-3.5 text-white" />
                                     </div>
                                     <span className="text-sm font-semibold text-stone-700 dark:text-stone-300">Moteur TTS</span>
@@ -113,16 +113,16 @@ export function SettingsModal({
                                         className={cn(
                                             "py-3 px-4 rounded-xl text-sm transition-all duration-300 border text-left relative",
                                             provider === 'elevenlabs'
-                                                ? "border-violet-500 bg-violet-500/10 text-violet-600 dark:text-violet-400 font-bold shadow-sm"
+                                                ? "border-primary bg-primary/10 text-primary font-bold shadow-sm"
                                                 : isElevenLabsAvailable
-                                                    ? "border-border/50 hover:border-violet-300 text-foreground/70 bg-muted/30"
+                                                    ? "border-border/50 hover:border-primary/50 text-foreground/70 bg-muted/30"
                                                     : "border-border/30 text-foreground/30 bg-muted/10 cursor-not-allowed"
                                         )}
                                     >
                                         <div className="font-semibold flex items-center gap-1.5">
                                             ElevenLabs
                                             {provider === 'elevenlabs' && isLoading && (
-                                                <span className="w-3 h-3 border-2 border-violet-500 border-t-transparent rounded-full animate-spin" />
+                                                <span className="w-3 h-3 border-2 border-primary border-t-transparent rounded-full animate-spin" />
                                             )}
                                         </div>
                                         <div className="text-[10px] opacity-70 mt-0.5">
@@ -161,7 +161,7 @@ export function SettingsModal({
                                     <select
                                         value={selectedElevenLabsVoice?.voice_id || ""}
                                         onChange={(e) => onElevenLabsVoiceChange(e.target.value)}
-                                        className="w-full p-3 rounded-2xl bg-violet-50 dark:bg-violet-900/20 text-sm outline-none focus:ring-2 focus:ring-violet-500/30 border border-violet-200 dark:border-violet-800 focus:border-violet-500/50 transition-all text-foreground"
+                                        className="w-full p-3 rounded-2xl bg-primary/5 dark:bg-primary/10 text-sm outline-none focus:ring-2 focus:ring-primary/30 border border-primary/20 dark:border-primary/30 focus:border-primary/50 transition-all text-foreground"
                                     >
                                         {elevenLabsVoices.map(v => (
                                             <option key={v.voice_id} value={v.voice_id}>
@@ -203,24 +203,24 @@ export function SettingsModal({
                                             <div className="space-y-2">
                                                 <div className="flex items-center justify-between">
                                                     <label className="text-xs font-medium text-muted-foreground">Stabilité</label>
-                                                    <span className="text-xs font-bold text-violet-500 bg-violet-500/10 px-2 py-0.5 rounded-md">{Math.round(stability * 100)}%</span>
+                                                    <span className="text-xs font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-md">{Math.round(stability * 100)}%</span>
                                                 </div>
                                                 <input
                                                     type="range" min="0" max="1" step="0.05" value={stability}
                                                     onChange={(e) => onStabilityChange(parseFloat(e.target.value))}
-                                                    className="w-full h-1.5 bg-violet-100 dark:bg-violet-900/30 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:bg-violet-500"
+                                                    className="w-full h-1.5 bg-primary/10 dark:bg-primary/20 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:bg-primary"
                                                 />
                                                 <p className="text-[10px] text-muted-foreground">Plus stable = plus cohérent</p>
                                             </div>
                                             <div className="space-y-2">
                                                 <div className="flex items-center justify-between">
                                                     <label className="text-xs font-medium text-muted-foreground">Clarté</label>
-                                                    <span className="text-xs font-bold text-violet-500 bg-violet-500/10 px-2 py-0.5 rounded-md">{Math.round(similarityBoost * 100)}%</span>
+                                                    <span className="text-xs font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-md">{Math.round(similarityBoost * 100)}%</span>
                                                 </div>
                                                 <input
                                                     type="range" min="0" max="1" step="0.05" value={similarityBoost}
                                                     onChange={(e) => onSimilarityBoostChange(parseFloat(e.target.value))}
-                                                    className="w-full h-1.5 bg-violet-100 dark:bg-violet-900/30 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:bg-violet-500"
+                                                    className="w-full h-1.5 bg-primary/10 dark:bg-primary/20 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:bg-primary"
                                                 />
                                                 <p className="text-[10px] text-muted-foreground">Plus haut = voix plus claire</p>
                                             </div>
@@ -228,12 +228,12 @@ export function SettingsModal({
                                         <div className="space-y-2">
                                             <div className="flex items-center justify-between">
                                                 <label className="text-xs font-medium text-muted-foreground">Vitesse</label>
-                                                <span className="text-xs font-bold text-violet-500 bg-violet-500/10 px-2 py-0.5 rounded-md">{rate}×</span>
+                                                <span className="text-xs font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-md">{rate}×</span>
                                             </div>
                                             <input
                                                 type="range" min="0.5" max="2" step="0.1" value={rate}
                                                 onChange={(e) => onRateChange(parseFloat(e.target.value))}
-                                                className="w-full h-1.5 bg-violet-100 dark:bg-violet-900/30 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:bg-violet-500"
+                                                className="w-full h-1.5 bg-primary/10 dark:bg-primary/20 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:bg-primary"
                                             />
                                         </div>
                                     </div>
