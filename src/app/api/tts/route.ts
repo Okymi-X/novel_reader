@@ -1,18 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { ElevenLabsClient } from '@elevenlabs/elevenlabs-js';
 
-// Server-side ElevenLabs client (secure - API key not exposed)
-function getElevenLabsClient(): ElevenLabsClient | null {
-    const apiKey = process.env.ELEVENLABS_API_KEY;
-    if (!apiKey) {
-        console.error('[TTS API] ELEVENLABS_API_KEY not configured');
-        return null;
-    }
-    return new ElevenLabsClient({ apiKey });
+const ELEVENLABS_API_URL = 'https://api.elevenlabs.io/v1';
+
+function getApiKey(): string | null {
+    return process.env.ELEVENLABS_API_KEY || null;
 }
 
 export async function POST(request: NextRequest) {
     try {
+        const apiKey = getApiKey();
+        if (!apiKey) {
+            return NextResponse.json(
+                { success: false, error: 'TTS service not configured' },
+                { status: 503 }
+            );
+        }
+
         const body = await request.json();
         const { text, voiceId, modelId, stability, similarityBoost, style } = body;
 
@@ -31,7 +34,7 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Text length limit (ElevenLabs has limits, plus cost consideration)
+        // Text length limit
         const MAX_TEXT_LENGTH = 5000;
         if (text.length > MAX_TEXT_LENGTH) {
             return NextResponse.json(
@@ -40,40 +43,53 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        const client = getElevenLabsClient();
-        if (!client) {
+        // Call ElevenLabs REST API directly
+        const response = await fetch(
+            `${ELEVENLABS_API_URL}/text-to-speech/${voiceId}`,
+            {
+                method: 'POST',
+                headers: {
+                    'Accept': 'audio/mpeg',
+                    'Content-Type': 'application/json',
+                    'xi-api-key': apiKey,
+                },
+                body: JSON.stringify({
+                    text,
+                    model_id: modelId || 'eleven_multilingual_v2',
+                    voice_settings: {
+                        stability: stability ?? 0.5,
+                        similarity_boost: similarityBoost ?? 0.75,
+                        style: style ?? 0.0,
+                    },
+                }),
+            }
+        );
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('[TTS API] ElevenLabs error:', response.status, errorText);
+            
+            if (response.status === 401) {
+                return NextResponse.json(
+                    { success: false, error: 'Invalid API key' },
+                    { status: 401 }
+                );
+            }
+            if (response.status === 429) {
+                return NextResponse.json(
+                    { success: false, error: 'API quota exceeded' },
+                    { status: 429 }
+                );
+            }
             return NextResponse.json(
-                { success: false, error: 'TTS service not configured' },
-                { status: 503 }
+                { success: false, error: `ElevenLabs error: ${response.status}` },
+                { status: response.status }
             );
         }
 
-        // Generate audio with ElevenLabs
-        const audioStream = await client.textToSpeech.convert(voiceId, {
-            text,
-            modelId: modelId || 'eleven_multilingual_v2',
-            outputFormat: 'mp3_44100_128',
-            voiceSettings: {
-                stability: stability ?? 0.5,
-                similarityBoost: similarityBoost ?? 0.75,
-                style: style ?? 0.0,
-            },
-        });
-
-        // Convert stream to buffer using the Web Streams API
-        const chunks: Uint8Array[] = [];
-        const reader = audioStream.getReader();
-        
-        while (true) {
-            const { done, value } = await reader.read();
-            if (done) break;
-            if (value) chunks.push(value);
-        }
-        
-        const audioBuffer = Buffer.concat(chunks);
-
-        // Return audio as base64 for client-side playback
-        const base64Audio = audioBuffer.toString('base64');
+        // Get audio buffer
+        const audioBuffer = await response.arrayBuffer();
+        const base64Audio = Buffer.from(audioBuffer).toString('base64');
 
         return NextResponse.json({
             success: true,
@@ -83,26 +99,9 @@ export async function POST(request: NextRequest) {
 
     } catch (error) {
         console.error('[TTS API] Error:', error);
-
         const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-
-        // Handle specific ElevenLabs errors
-        if (errorMessage.includes('quota') || errorMessage.includes('limit')) {
-            return NextResponse.json(
-                { success: false, error: 'API quota exceeded' },
-                { status: 429 }
-            );
-        }
-
-        if (errorMessage.includes('unauthorized') || errorMessage.includes('401')) {
-            return NextResponse.json(
-                { success: false, error: 'Invalid API key' },
-                { status: 401 }
-            );
-        }
-
         return NextResponse.json(
-            { success: false, error: 'Failed to generate audio' },
+            { success: false, error: `Failed to generate audio: ${errorMessage}` },
             { status: 500 }
         );
     }
@@ -111,24 +110,43 @@ export async function POST(request: NextRequest) {
 // GET endpoint to fetch available voices
 export async function GET() {
     try {
-        const client = getElevenLabsClient();
-        if (!client) {
+        const apiKey = getApiKey();
+        if (!apiKey) {
             return NextResponse.json(
                 { success: false, error: 'TTS service not configured' },
                 { status: 503 }
             );
         }
 
-        const response = await client.voices.getAll();
-        const voices = response.voices || [];
+        // Call ElevenLabs REST API directly
+        const response = await fetch(`${ELEVENLABS_API_URL}/voices`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'xi-api-key': apiKey,
+            },
+        });
 
-        // Filter and format voices
-        const formattedVoices = voices.map(voice => ({
-            voice_id: voice.voiceId,
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('[TTS API] ElevenLabs voices error:', response.status, errorText);
+            return NextResponse.json(
+                { success: false, error: `Failed to fetch voices: ${response.status}` },
+                { status: response.status }
+            );
+        }
+
+        const data = await response.json();
+        const voices = data.voices || [];
+
+        // Format voices
+        const formattedVoices = voices.map((voice: Record<string, unknown>) => ({
+            voice_id: voice.voice_id,
             name: voice.name,
             category: voice.category || 'custom',
             description: voice.description,
             labels: voice.labels,
+            preview_url: voice.preview_url,
         }));
 
         return NextResponse.json({
@@ -138,8 +156,9 @@ export async function GET() {
 
     } catch (error) {
         console.error('[TTS API] Error fetching voices:', error);
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
         return NextResponse.json(
-            { success: false, error: 'Failed to fetch voices' },
+            { success: false, error: `Failed to fetch voices: ${errorMessage}` },
             { status: 500 }
         );
     }
