@@ -44,7 +44,7 @@
   --popover: #FFFFFF;
   --popover-foreground: #1A1A1A;
   
-  --muted: #E5D5C5; /* Slightly darker than bg */
+  --muted: #E5D5C5;
   --muted-foreground: #6B7280;
   
   --accent: #F0E0CC; 
@@ -93,34 +93,47 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Custom scrollbar — thin + themed */
-::-webkit-scrollbar {
-  width: 6px;
+/* Scrollbar styling — desktop only */
+@media (min-width: 768px) {
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.12);
+    border-radius: 100px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.2);
+  }
+
+  .dark ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  .dark ::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.2);
+  }
 }
 
-::-webkit-scrollbar-track {
-  background: transparent;
+/* Hide scrollbar on mobile for cleaner UI */
+@media (max-width: 767px) {
+  * {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  
+  *::-webkit-scrollbar {
+    display: none;
+  }
 }
 
-::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.12);
-  border-radius: 100px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 0, 0, 0.2);
-}
-
-/* Dark mode scrollbar */
-.dark ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
-}
-
-.dark ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.2);
-}
-
-/* Smooth scroll for main content */
+/* Smooth scroll */
 * {
   scroll-behavior: smooth;
 }
@@ -155,7 +168,7 @@ input[type="range"]::-webkit-slider-thumb {
 }
 
 .animate-fade-in {
-  animation: fade-in 0.4s ease-out;
+  animation: fade-in 0.3s ease-out;
 }
 
 /* Focus styles */
@@ -163,4 +176,19 @@ input[type="range"]::-webkit-slider-thumb {
   outline: 2px solid #FF6B35;
   outline-offset: 2px;
   border-radius: 4px;
+}
+
+/* Safe area padding for mobile notches */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+/* Touch feedback for mobile */
+@media (hover: none) {
+  button:active,
+  a:active {
+    opacity: 0.8;
+  }
 }
