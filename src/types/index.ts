@@ -30,3 +30,6 @@ export interface NovelInfo {
     status?: string;
     volumes: Volume[];
 }
+
+// Re-export TTS types
+export * from './tts';

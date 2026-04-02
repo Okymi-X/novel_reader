@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useCallback } from 'react';
 import { useLocalStorage } from '../hooks/utils/useLocalStorage';
+import { TTSProvider } from '@/types/tts';
 
 export interface AppSettings {
     theme: 'paper' | 'light' | 'dark' | 'sepia';
@@ -10,6 +11,11 @@ export interface AppSettings {
     rate: number;
     pitch: number;
     voiceName: string;
+    // TTS Provider settings
+    ttsProvider: TTSProvider;
+    elevenLabsVoiceId: string;
+    elevenLabsStability: number;
+    elevenLabsSimilarityBoost: number;
 }
 
 interface SettingsContextType {
@@ -25,6 +31,11 @@ const defaultSettings: AppSettings = {
     rate: 1,
     pitch: 1,
     voiceName: '',
+    // TTS Provider defaults
+    ttsProvider: 'browser',
+    elevenLabsVoiceId: 'XB0fDUnXU5powFXDhCwa', // Charlotte (French)
+    elevenLabsStability: 0.5,
+    elevenLabsSimilarityBoost: 0.75,
 };
 
 const SettingsContext = createContext<SettingsContextType | undefined>(undefined);

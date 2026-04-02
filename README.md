@@ -20,6 +20,7 @@
 ## ✨ Fonctionnalités Principales
 
 * **🎧 Smart Audio TTS (Voix Réalistes) :** Le lecteur intègre un moteur intelligent qui déverrouille et force l'utilisation des "Voix Premium / Neuronales" natives (Google Online, Siri, Microsoft Natural) cachées dans le système de l'utilisateur, offrant un résultat ultra-réaliste **gratuitement et sans API externe**.
+* **🎤 ElevenLabs AI TTS (Premium) :** Support optionnel d'ElevenLabs pour des voix IA de qualité studio. Configurez votre clé API pour débloquer des voix multilingues ultra-réalistes avec contrôle de stabilité et clarté.
 * **📱 Interface Native UI :** Navigation pensée pour mobile avec un Bottom Navigation Bar translucide (façon iOS) et une expérience PWA parfaite.
 * **⚡ Clean Architecture :** Le projet est rigoureusement structuré sous les préceptes de la Clean Architecture (Domaine, Infrastructures, Use Cases) assurant une maintenabilité exceptionnelle et facilitant l'intégration de nouveaux parsers.
 * **🎨 Thèmes Visuels :** Personnalisation complète (Papier, Clair, Sombre, Sépia) et contrôles typographiques complets (Sans-Serif/Serif, taille du texte dynamique).
@@ -39,7 +40,11 @@ cd novel-reader
 npm install
 # ou yarn install / pnpm install
 
-# 3. Lancer le serveur de développement
+# 3. (Optionnel) Configurer ElevenLabs TTS
+# Créez un fichier .env.local et ajoutez votre clé API
+echo "ELEVENLABS_API_KEY=votre_cle_api" > .env.local
+
+# 4. Lancer le serveur de développement
 npm run dev
 ```
 

@@ -5,7 +5,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
 
 import { useChapterLoader } from '@/presentation/hooks/useChapterLoader';
-import { useAudioReader } from '@/presentation/hooks/useAudioReader';
+import { useElevenLabsReader } from '@/presentation/hooks/useElevenLabsReader';
 import { useReadingProgress } from '@/presentation/hooks/useReadingProgress';
 import { useKeyboardNavigation } from '@/presentation/hooks/useKeyboardNavigation';
 import { useAppSettings } from '@/presentation/state/SettingsContext';
@@ -29,19 +29,28 @@ function ReadContent() {
 
     const { saveProgress } = useReadingProgress();
 
+    // Use the new ElevenLabs-enabled audio reader
     const {
-        currentIndex, isPlaying, rate, setRate, pitch, setPitch,
-        voices, selectedVoice, setVoiceByName, togglePlay,
-        next: nextParagraph, prev: prevParagraph, seekTo, setParagraph,
-    } = useAudioReader(chapter?.paragraphs || []);
+        currentIndex, isPlaying, isLoading: audioLoading, error: audioError,
+        provider, setProvider, isElevenLabsAvailable,
+        rate, setRate, pitch, setPitch,
+        browserVoices, selectedBrowserVoice, setBrowserVoiceByName,
+        elevenLabsVoices, selectedElevenLabsVoice, setElevenLabsVoice,
+        stability, setStability, similarityBoost, setSimilarityBoost,
+        togglePlay, next: nextParagraph, prev: prevParagraph, seekTo, setParagraph,
+    } = useElevenLabsReader(chapter?.paragraphs || []);
 
     // Set Audio settings to global defaults once on load
     useEffect(() => {
         setRate(settings.rate);
         setPitch(settings.pitch);
-        if (settings.voiceName) setVoiceByName(settings.voiceName);
+        if (settings.voiceName) setBrowserVoiceByName(settings.voiceName);
+        if (settings.ttsProvider) setProvider(settings.ttsProvider);
+        if (settings.elevenLabsVoiceId) setElevenLabsVoice(settings.elevenLabsVoiceId);
+        if (settings.elevenLabsStability !== undefined) setStability(settings.elevenLabsStability);
+        if (settings.elevenLabsSimilarityBoost !== undefined) setSimilarityBoost(settings.elevenLabsSimilarityBoost);
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [settings.rate, settings.pitch, settings.voiceName]);
+    }, []);
 
     // Handle scroll updates
     const handleScrollChange = (index: number) => {
@@ -110,19 +119,49 @@ function ReadContent() {
             />
 
             <AudioControls
-                isPlaying={isPlaying} onTogglePlay={togglePlay}
-                onNext={handleNext} onPrev={prevParagraph}
-                currentParagraph={currentIndex} totalParagraphs={chapter.paragraphs.length} onSeek={seekTo}
-                rate={rate} onRateChange={setRate} pitch={pitch} onPitchChange={setPitch}
-                voices={voices} selectedVoice={selectedVoice}
-                onVoiceChange={(name) => { setVoiceByName(name); updateSettings({ voiceName: name }); }}
-                fontSize={fontSize} onFontSizeChange={(size) => { setFontSize(size); updateSettings({ fontSize: size }); }}
-                theme={theme} onThemeChange={(val) => { setTheme(val); updateSettings({ theme: val }); }}
-                fontFamily={fontFamily} onFontFamilyChange={(font) => { setFontFamily(font); updateSettings({ fontFamily: font }); }}
+                isPlaying={isPlaying}
+                onTogglePlay={togglePlay}
+                onNext={handleNext}
+                onPrev={prevParagraph}
+                currentParagraph={currentIndex}
+                totalParagraphs={chapter.paragraphs.length}
+                onSeek={seekTo}
+                // TTS Provider
+                provider={provider}
+                onProviderChange={(p) => { setProvider(p); updateSettings({ ttsProvider: p }); }}
+                isElevenLabsAvailable={isElevenLabsAvailable}
+                // Browser TTS
+                rate={rate}
+                onRateChange={setRate}
+                pitch={pitch}
+                onPitchChange={setPitch}
+                voices={browserVoices}
+                selectedVoice={selectedBrowserVoice}
+                onVoiceChange={(name) => { setBrowserVoiceByName(name); updateSettings({ voiceName: name }); }}
+                // ElevenLabs
+                elevenLabsVoices={elevenLabsVoices}
+                selectedElevenLabsVoice={selectedElevenLabsVoice}
+                onElevenLabsVoiceChange={(id) => { setElevenLabsVoice(id); updateSettings({ elevenLabsVoiceId: id }); }}
+                stability={stability}
+                onStabilityChange={(v) => { setStability(v); updateSettings({ elevenLabsStability: v }); }}
+                similarityBoost={similarityBoost}
+                onSimilarityBoostChange={(v) => { setSimilarityBoost(v); updateSettings({ elevenLabsSimilarityBoost: v }); }}
+                // Visual
+                fontSize={fontSize}
+                onFontSizeChange={(size) => { setFontSize(size); updateSettings({ fontSize: size }); }}
+                theme={theme}
+                onThemeChange={(val) => { setTheme(val); updateSettings({ theme: val }); }}
+                fontFamily={fontFamily}
+                onFontFamilyChange={(font) => { setFontFamily(font); updateSettings({ fontFamily: font }); }}
+                // Novel info
                 title={chapter.title}
-                hasNextChapter={!!chapter.nextUrl} hasPrevChapter={!!chapter.prevUrl}
+                hasNextChapter={!!chapter.nextUrl}
+                hasPrevChapter={!!chapter.prevUrl}
                 onNextChapter={() => navigateToChapter(chapter.nextUrl)}
                 onPrevChapter={() => navigateToChapter(chapter.prevUrl)}
+                // Loading state
+                isLoading={audioLoading}
+                error={audioError}
             />
         </div>
     );
