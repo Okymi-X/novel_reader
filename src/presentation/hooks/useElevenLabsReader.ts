@@ -1,19 +1,8 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Paragraph } from '@/types';
-import { TTSProvider, ElevenLabsVoice, ELEVENLABS_VOICES } from '@/types/tts';
+import { TTSProvider, ElevenLabsVoice, KokoroVoice, ELEVENLABS_VOICES, KOKORO_VOICES } from '@/types/tts';
 import { elevenLabsService } from '@/infrastructure/tts/ElevenLabsService';
-
-interface AudioReaderConfig {
-    provider: TTSProvider;
-    rate: number;
-    pitch: number;
-    // Browser TTS
-    browserVoice: SpeechSynthesisVoice | null;
-    // ElevenLabs
-    elevenLabsVoiceId: string;
-    stability: number;
-    similarityBoost: number;
-}
+import { kokoroService } from '@/infrastructure/tts/KokoroService';
 
 interface UseElevenLabsReaderReturn {
     currentIndex: number;
@@ -41,6 +30,10 @@ interface UseElevenLabsReaderReturn {
     setStability: (value: number) => void;
     similarityBoost: number;
     setSimilarityBoost: (value: number) => void;
+    // Kokoro
+    kokoroVoices: KokoroVoice[];
+    selectedKokoroVoice: KokoroVoice | null;
+    setKokoroVoice: (voiceId: string) => void;
     // Playback controls
     togglePlay: () => void;
     play: () => void;
@@ -77,6 +70,12 @@ export function useElevenLabsReader(paragraphs: Paragraph[]): UseElevenLabsReade
     );
     const [stability, setStability] = useState(0.5);
     const [similarityBoost, setSimilarityBoost] = useState(0.75);
+
+    // Kokoro state
+    const [kokoroVoices] = useState<KokoroVoice[]>(KOKORO_VOICES);
+    const [selectedKokoroVoice, setSelectedKokoroVoice] = useState<KokoroVoice | null>(
+        KOKORO_VOICES[0] || null
+    );
 
     // Refs
     const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
@@ -250,6 +249,57 @@ export function useElevenLabsReader(paragraphs: Paragraph[]): UseElevenLabsReade
         }
     }, [selectedElevenLabsVoice, stability, similarityBoost, rate]);
 
+    // Speak with Kokoro (free, open-source)
+    const speakKokoro = useCallback(async (text: string, onEnd: () => void) => {
+        if (!selectedKokoroVoice) {
+            setError('Aucune voix Kokoro sélectionnée');
+            return;
+        }
+
+        // Check if already cached (from prefetch)
+        const isCached = kokoroService.isAudioCached(text, selectedKokoroVoice.id);
+        if (!isCached) {
+            setIsLoading(true);
+        }
+        setError(null);
+
+        try {
+            const audioUrl = await kokoroService.speak(text, selectedKokoroVoice.id, rate);
+
+            if (isCancelledRef.current || !audioUrl) {
+                if (!audioUrl) setError('Échec de génération audio');
+                return;
+            }
+
+            const audio = new Audio(audioUrl);
+            audio.playbackRate = rate;
+            audioRef.current = audio;
+
+            audio.onended = () => {
+                if (!isCancelledRef.current) {
+                    onEnd();
+                }
+            };
+
+            audio.onerror = () => {
+                if (!isCancelledRef.current) {
+                    setError('Erreur de lecture audio');
+                    setIsPlaying(false);
+                }
+            };
+
+            await audio.play();
+        } catch (err) {
+            if (!isCancelledRef.current) {
+                const message = err instanceof Error ? err.message : 'Erreur inconnue';
+                setError(message);
+                setIsPlaying(false);
+            }
+        } finally {
+            setIsLoading(false);
+        }
+    }, [selectedKokoroVoice, rate]);
+
     // Prefetch upcoming paragraphs when index changes
     useEffect(() => {
         if (provider === 'elevenlabs' && isElevenLabsAvailable && selectedElevenLabsVoice && isPlaying) {
@@ -262,8 +312,11 @@ export function useElevenLabsReader(paragraphs: Paragraph[]): UseElevenLabsReade
                     similarityBoost,
                 }
             );
+        } else if (provider === 'kokoro' && selectedKokoroVoice && isPlaying) {
+            const texts = paragraphs.map(p => p.text || '');
+            kokoroService.prefetchParagraphs(texts, selectedKokoroVoice.id, currentIndex, 2);
         }
-    }, [currentIndex, provider, isElevenLabsAvailable, selectedElevenLabsVoice, stability, similarityBoost, paragraphs, isPlaying]);
+    }, [currentIndex, provider, isElevenLabsAvailable, selectedElevenLabsVoice, selectedKokoroVoice, stability, similarityBoost, paragraphs, isPlaying]);
 
     // Speak paragraph
     const speakParagraph = useCallback((index: number) => {
@@ -288,13 +341,15 @@ export function useElevenLabsReader(paragraphs: Paragraph[]): UseElevenLabsReade
                 setCurrentIndex(prev => prev + 1);
             };
 
-            if (provider === 'elevenlabs' && isElevenLabsAvailable) {
+            if (provider === 'kokoro') {
+                speakKokoro(paragraph.text, onEnd);
+            } else if (provider === 'elevenlabs' && isElevenLabsAvailable) {
                 speakElevenLabs(paragraph.text, onEnd);
             } else {
                 speakBrowser(paragraph.text, onEnd);
             }
         }, 100);
-    }, [paragraphs, provider, isElevenLabsAvailable, speakBrowser, speakElevenLabs, stopPlayback]);
+    }, [paragraphs, provider, isElevenLabsAvailable, speakBrowser, speakElevenLabs, speakKokoro, stopPlayback]);
 
     // Main playback effect
     useEffect(() => {
@@ -310,6 +365,7 @@ export function useElevenLabsReader(paragraphs: Paragraph[]): UseElevenLabsReade
         return () => {
             stopPlayback();
             elevenLabsService.clearCache();
+            kokoroService.clearCache();
         };
     }, [stopPlayback]);
 
@@ -319,7 +375,7 @@ export function useElevenLabsReader(paragraphs: Paragraph[]): UseElevenLabsReade
             speakParagraph(currentIndex);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [provider, rate, pitch, selectedBrowserVoice, selectedElevenLabsVoice, stability, similarityBoost]);
+    }, [provider, rate, pitch, selectedBrowserVoice, selectedElevenLabsVoice, selectedKokoroVoice, stability, similarityBoost]);
 
     // Voice setters
     const setBrowserVoiceByName = useCallback((name: string) => {
@@ -331,6 +387,11 @@ export function useElevenLabsReader(paragraphs: Paragraph[]): UseElevenLabsReade
         const voice = elevenLabsVoices.find(v => v.voice_id === voiceId);
         if (voice) setSelectedElevenLabsVoice(voice);
     }, [elevenLabsVoices]);
+
+    const setKokoroVoice = useCallback((voiceId: string) => {
+        const voice = kokoroVoices.find(v => v.id === voiceId);
+        if (voice) setSelectedKokoroVoice(voice);
+    }, [kokoroVoices]);
 
     // Controls
     const togglePlay = () => setIsPlaying(!isPlaying);
@@ -365,6 +426,9 @@ export function useElevenLabsReader(paragraphs: Paragraph[]): UseElevenLabsReade
         setStability,
         similarityBoost,
         setSimilarityBoost,
+        kokoroVoices,
+        selectedKokoroVoice,
+        setKokoroVoice,
         togglePlay,
         play,
         pause,

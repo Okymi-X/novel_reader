@@ -1,7 +1,7 @@
 import { X, Type, Volume2, Sparkles } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { TTSProvider, ElevenLabsVoice } from "@/types/tts";
+import { TTSProvider, ElevenLabsVoice, KokoroVoice } from "@/types/tts";
 
 interface SettingsModalProps {
     show: boolean;
@@ -26,6 +26,10 @@ interface SettingsModalProps {
     onStabilityChange: (value: number) => void;
     similarityBoost: number;
     onSimilarityBoostChange: (value: number) => void;
+    // Kokoro Settings
+    kokoroVoices: KokoroVoice[];
+    selectedKokoroVoice: KokoroVoice | null;
+    onKokoroVoiceChange: (voiceId: string) => void;
     // Visual Settings
     fontSize: number;
     onFontSizeChange: (size: number) => void;
@@ -45,6 +49,7 @@ export function SettingsModal({
     voices, selectedVoice, onVoiceChange,
     elevenLabsVoices, selectedElevenLabsVoice, onElevenLabsVoiceChange,
     stability, onStabilityChange, similarityBoost, onSimilarityBoostChange,
+    kokoroVoices, selectedKokoroVoice, onKokoroVoiceChange,
     fontSize, onFontSizeChange, theme, onThemeChange, fontFamily, onFontFamilyChange,
     isLoading, error
 }: SettingsModalProps) {
@@ -94,24 +99,41 @@ export function SettingsModal({
                                     </div>
                                     <span className="text-sm font-semibold text-stone-700 dark:text-stone-300">Moteur TTS</span>
                                 </div>
-                                <div className="grid grid-cols-2 gap-2">
+                                <div className="grid grid-cols-3 gap-2">
                                     <button
                                         onClick={() => onProviderChange('browser')}
                                         className={cn(
-                                            "py-3 px-4 rounded-xl text-sm transition-all duration-300 border text-left",
+                                            "py-3 px-3 rounded-xl text-sm transition-all duration-300 border text-left",
                                             provider === 'browser'
                                                 ? "border-primary bg-primary/10 text-primary font-bold shadow-sm"
                                                 : "border-border/50 hover:border-foreground/20 text-foreground/70 bg-muted/30"
                                         )}
                                     >
-                                        <div className="font-semibold">Navigateur</div>
-                                        <div className="text-[10px] opacity-70 mt-0.5">Gratuit</div>
+                                        <div className="font-semibold text-xs">Navigateur</div>
+                                        <div className="text-[9px] opacity-70 mt-0.5">Gratuit</div>
+                                    </button>
+                                    <button
+                                        onClick={() => onProviderChange('kokoro')}
+                                        className={cn(
+                                            "py-3 px-3 rounded-xl text-sm transition-all duration-300 border text-left relative",
+                                            provider === 'kokoro'
+                                                ? "border-primary bg-primary/10 text-primary font-bold shadow-sm"
+                                                : "border-border/50 hover:border-primary/50 text-foreground/70 bg-muted/30"
+                                        )}
+                                    >
+                                        <div className="font-semibold text-xs flex items-center gap-1">
+                                            Kokoro
+                                            {provider === 'kokoro' && isLoading && (
+                                                <span className="w-2.5 h-2.5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                                            )}
+                                        </div>
+                                        <div className="text-[9px] opacity-70 mt-0.5">AI Gratuit</div>
                                     </button>
                                     <button
                                         onClick={() => isElevenLabsAvailable && onProviderChange('elevenlabs')}
                                         disabled={!isElevenLabsAvailable}
                                         className={cn(
-                                            "py-3 px-4 rounded-xl text-sm transition-all duration-300 border text-left relative",
+                                            "py-3 px-3 rounded-xl text-sm transition-all duration-300 border text-left relative",
                                             provider === 'elevenlabs'
                                                 ? "border-primary bg-primary/10 text-primary font-bold shadow-sm"
                                                 : isElevenLabsAvailable
@@ -119,14 +141,14 @@ export function SettingsModal({
                                                     : "border-border/30 text-foreground/30 bg-muted/10 cursor-not-allowed"
                                         )}
                                     >
-                                        <div className="font-semibold flex items-center gap-1.5">
+                                        <div className="font-semibold text-xs flex items-center gap-1">
                                             ElevenLabs
                                             {provider === 'elevenlabs' && isLoading && (
-                                                <span className="w-3 h-3 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                                                <span className="w-2.5 h-2.5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
                                             )}
                                         </div>
-                                        <div className="text-[10px] opacity-70 mt-0.5">
-                                            {isElevenLabsAvailable ? 'Premium AI' : 'Non configuré'}
+                                        <div className="text-[9px] opacity-70 mt-0.5">
+                                            {isElevenLabsAvailable ? 'Premium' : 'Non configuré'}
                                         </div>
                                     </button>
                                 </div>
@@ -157,6 +179,18 @@ export function SettingsModal({
                                             );
                                         })}
                                     </select>
+                                ) : provider === 'kokoro' ? (
+                                    <select
+                                        value={selectedKokoroVoice?.id || ""}
+                                        onChange={(e) => onKokoroVoiceChange(e.target.value)}
+                                        className="w-full p-3 rounded-2xl bg-emerald-500/5 dark:bg-emerald-500/10 text-sm outline-none focus:ring-2 focus:ring-emerald-500/30 border border-emerald-500/20 dark:border-emerald-500/30 focus:border-emerald-500/50 transition-all text-foreground"
+                                    >
+                                        {kokoroVoices.map(v => (
+                                            <option key={v.id} value={v.id}>
+                                                {v.language === 'fr' ? '🇫🇷 ' : '🇬🇧 '}{v.name} ({v.gender === 'female' ? '♀' : '♂'})
+                                            </option>
+                                        ))}
+                                    </select>
                                 ) : (
                                     <select
                                         value={selectedElevenLabsVoice?.voice_id || ""}
@@ -171,7 +205,7 @@ export function SettingsModal({
                                     </select>
                                 )}
 
-                                {/* Rate & Pitch (Browser) or ElevenLabs settings */}
+                                {/* Rate & Pitch (Browser) or ElevenLabs/Kokoro settings */}
                                 {provider === 'browser' ? (
                                     <div className="grid grid-cols-2 gap-4">
                                         <div className="space-y-2">
@@ -195,6 +229,26 @@ export function SettingsModal({
                                                 onChange={(e) => onPitchChange(parseFloat(e.target.value))}
                                                 className="w-full h-1.5 bg-muted rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:bg-blue-500"
                                             />
+                                        </div>
+                                    </div>
+                                ) : provider === 'kokoro' ? (
+                                    <div className="space-y-4">
+                                        <div className="space-y-2">
+                                            <div className="flex items-center justify-between">
+                                                <label className="text-xs font-medium text-muted-foreground">Vitesse</label>
+                                                <span className="text-xs font-bold text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded-md">{rate}×</span>
+                                            </div>
+                                            <input
+                                                type="range" min="0.5" max="2" step="0.1" value={rate}
+                                                onChange={(e) => onRateChange(parseFloat(e.target.value))}
+                                                className="w-full h-1.5 bg-emerald-500/10 dark:bg-emerald-500/20 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:bg-emerald-500"
+                                            />
+                                        </div>
+                                        <div className="p-3 rounded-xl bg-emerald-500/5 border border-emerald-500/20">
+                                            <p className="text-xs text-emerald-600 dark:text-emerald-400">
+                                                🎯 <strong>Kokoro</strong> est un modèle TTS open-source gratuit avec qualité IA.
+                                                <span className="block mt-1 text-emerald-500/70">⚠️ Service externe (HuggingFace) - peut être lent ou indisponible</span>
+                                            </p>
                                         </div>
                                     </div>
                                 ) : (

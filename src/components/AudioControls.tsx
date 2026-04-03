@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 import { AudioWaveform } from "./audio/AudioWaveform";
 import { ProgressBar } from "./audio/ProgressBar";
 import { SettingsModal } from "./audio/SettingsModal";
-import { TTSProvider, ElevenLabsVoice } from "@/types/tts";
+import { TTSProvider, ElevenLabsVoice, KokoroVoice } from "@/types/tts";
 
 interface AudioControlsProps {
     isPlaying: boolean;
@@ -43,6 +43,11 @@ interface AudioControlsProps {
     similarityBoost: number;
     onSimilarityBoostChange: (value: number) => void;
 
+    // Kokoro Settings
+    kokoroVoices: KokoroVoice[];
+    selectedKokoroVoice: KokoroVoice | null;
+    onKokoroVoiceChange: (voiceId: string) => void;
+
     // Novel Info
     title?: string;
 
@@ -72,6 +77,7 @@ export function AudioControls({
     rate, onRateChange, pitch, onPitchChange, voices, selectedVoice, onVoiceChange,
     elevenLabsVoices, selectedElevenLabsVoice, onElevenLabsVoiceChange,
     stability, onStabilityChange, similarityBoost, onSimilarityBoostChange,
+    kokoroVoices, selectedKokoroVoice, onKokoroVoiceChange,
     fontSize, onFontSizeChange, theme, onThemeChange, fontFamily, onFontFamilyChange,
     title, hasNextChapter, hasPrevChapter, onNextChapter, onPrevChapter,
     isLoading, error
@@ -222,6 +228,9 @@ export function AudioControls({
                 onStabilityChange={onStabilityChange}
                 similarityBoost={similarityBoost}
                 onSimilarityBoostChange={onSimilarityBoostChange}
+                kokoroVoices={kokoroVoices}
+                selectedKokoroVoice={selectedKokoroVoice}
+                onKokoroVoiceChange={onKokoroVoiceChange}
                 fontSize={fontSize} onFontSizeChange={onFontSizeChange}
                 theme={theme} onThemeChange={onThemeChange}
                 fontFamily={fontFamily} onFontFamilyChange={onFontFamilyChange}

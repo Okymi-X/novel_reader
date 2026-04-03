@@ -16,6 +16,7 @@ export interface AppSettings {
     elevenLabsVoiceId: string;
     elevenLabsStability: number;
     elevenLabsSimilarityBoost: number;
+    kokoroVoiceId: string;
 }
 
 interface SettingsContextType {
@@ -36,6 +37,7 @@ const defaultSettings: AppSettings = {
     elevenLabsVoiceId: 'XB0fDUnXU5powFXDhCwa', // Charlotte (French)
     elevenLabsStability: 0.5,
     elevenLabsSimilarityBoost: 0.75,
+    kokoroVoiceId: 'ff_siwis', // French voice (Siwis)
 };
 
 const SettingsContext = createContext<SettingsContextType | undefined>(undefined);

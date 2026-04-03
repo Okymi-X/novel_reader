@@ -1,5 +1,5 @@
 // TTS Provider Types
-export type TTSProvider = 'browser' | 'elevenlabs';
+export type TTSProvider = 'browser' | 'elevenlabs' | 'kokoro';
 
 export interface ElevenLabsVoice {
     voice_id: string;
@@ -10,6 +10,13 @@ export interface ElevenLabsVoice {
     labels?: Record<string, string>;
 }
 
+export interface KokoroVoice {
+    id: string;
+    name: string;
+    language: string;
+    gender: 'male' | 'female';
+}
+
 export interface TTSConfig {
     provider: TTSProvider;
     // Browser TTS settings
@@ -17,6 +24,8 @@ export interface TTSConfig {
     // ElevenLabs settings
     elevenLabsVoiceId?: string;
     elevenLabsVoiceName?: string;
+    // Kokoro settings
+    kokoroVoiceId?: string;
     // Common settings
     rate: number;
     pitch: number;
@@ -38,6 +47,24 @@ export interface TTSResponse {
     audioUrl?: string;
     error?: string;
 }
+
+// Kokoro voices (French + English)
+export const KOKORO_VOICES: KokoroVoice[] = [
+    // French voices
+    { id: 'ff_siwis', name: 'Siwis (FR)', language: 'fr', gender: 'female' },
+    // English voices
+    { id: 'af_heart', name: 'Heart', language: 'en', gender: 'female' },
+    { id: 'af_bella', name: 'Bella', language: 'en', gender: 'female' },
+    { id: 'af_nicole', name: 'Nicole', language: 'en', gender: 'female' },
+    { id: 'af_sarah', name: 'Sarah', language: 'en', gender: 'female' },
+    { id: 'af_sky', name: 'Sky', language: 'en', gender: 'female' },
+    { id: 'am_adam', name: 'Adam', language: 'en', gender: 'male' },
+    { id: 'am_michael', name: 'Michael', language: 'en', gender: 'male' },
+    { id: 'bf_emma', name: 'Emma (UK)', language: 'en', gender: 'female' },
+    { id: 'bf_isabella', name: 'Isabella (UK)', language: 'en', gender: 'female' },
+    { id: 'bm_george', name: 'George (UK)', language: 'en', gender: 'male' },
+    { id: 'bm_lewis', name: 'Lewis (UK)', language: 'en', gender: 'male' },
+];
 
 // Default ElevenLabs voices (popular French voices)
 export const ELEVENLABS_VOICES: ElevenLabsVoice[] = [

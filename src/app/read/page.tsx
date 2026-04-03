@@ -37,6 +37,7 @@ function ReadContent() {
         browserVoices, selectedBrowserVoice, setBrowserVoiceByName,
         elevenLabsVoices, selectedElevenLabsVoice, setElevenLabsVoice,
         stability, setStability, similarityBoost, setSimilarityBoost,
+        kokoroVoices, selectedKokoroVoice, setKokoroVoice,
         togglePlay, next: nextParagraph, prev: prevParagraph, seekTo, setParagraph,
     } = useElevenLabsReader(chapter?.paragraphs || []);
 
@@ -49,6 +50,7 @@ function ReadContent() {
         if (settings.elevenLabsVoiceId) setElevenLabsVoice(settings.elevenLabsVoiceId);
         if (settings.elevenLabsStability !== undefined) setStability(settings.elevenLabsStability);
         if (settings.elevenLabsSimilarityBoost !== undefined) setSimilarityBoost(settings.elevenLabsSimilarityBoost);
+        if (settings.kokoroVoiceId) setKokoroVoice(settings.kokoroVoiceId);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
@@ -146,6 +148,10 @@ function ReadContent() {
                 onStabilityChange={(v) => { setStability(v); updateSettings({ elevenLabsStability: v }); }}
                 similarityBoost={similarityBoost}
                 onSimilarityBoostChange={(v) => { setSimilarityBoost(v); updateSettings({ elevenLabsSimilarityBoost: v }); }}
+                // Kokoro
+                kokoroVoices={kokoroVoices}
+                selectedKokoroVoice={selectedKokoroVoice}
+                onKokoroVoiceChange={(id) => { setKokoroVoice(id); updateSettings({ kokoroVoiceId: id }); }}
                 // Visual
                 fontSize={fontSize}
                 onFontSizeChange={(size) => { setFontSize(size); updateSettings({ fontSize: size }); }}
