@@ -30,8 +30,8 @@ export async function POST(request: NextRequest) {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                data: [truncatedText, voiceId, 'cpu', speed],
-                fn_index: 0,
+                data: [truncatedText, voiceId, speed, true],
+                fn_index: 4,
                 session_hash: sessionId,
             }),
         });
@@ -44,7 +44,8 @@ export async function POST(request: NextRequest) {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    data: [truncatedText, voiceId, 'cpu', speed],
+                    data: [truncatedText, voiceId, speed, true],
+                    fn_index: 4,
                     session_hash: sessionId,
                 }),
             });

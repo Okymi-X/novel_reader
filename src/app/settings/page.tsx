@@ -176,21 +176,91 @@ export default function SettingsPage() {
                     </section>
                 </div>
 
+                {/* TTS Provider Selection */}
+                <section className="bg-card rounded-3xl border border-border p-6 md:p-8">
+                    <div className="flex items-center gap-3 mb-6">
+                        <div className="w-10 h-10 bg-primary/10 rounded-2xl flex items-center justify-center">
+                            <Sparkles className="w-5 h-5 text-primary" />
+                        </div>
+                        <div>
+                            <h2 className="text-xl font-serif font-bold text-foreground">Moteur vocal</h2>
+                            <p className="text-sm text-muted-foreground">Choisissez votre voix de narration</p>
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        {/* Browser TTS */}
+                        <button
+                            onClick={() => updateSettings({ ttsProvider: 'browser' })}
+                            className={`flex flex-col gap-2 p-5 rounded-2xl border-2 transition-all duration-200 text-left ${settings.ttsProvider === 'browser'
+                                ? 'border-primary bg-primary/5 shadow-sm'
+                                : 'border-border/50 hover:border-primary/30 hover:bg-muted/30'
+                            }`}
+                        >
+                            <h3 className={`font-serif font-bold ${settings.ttsProvider === 'browser' ? 'text-primary' : 'text-foreground'}`}>Système</h3>
+                            <p className="text-xs text-muted-foreground leading-relaxed">
+                                Voix intégrées à votre appareil. Rapide et fonctionne hors-ligne.
+                            </p>
+                        </button>
+
+                        {/* Kokoro TTS */}
+                        <button
+                            onClick={() => updateSettings({ ttsProvider: 'kokoro' })}
+                            className={`flex flex-col gap-2 p-5 rounded-2xl border-2 transition-all duration-200 text-left ${settings.ttsProvider === 'kokoro'
+                                ? 'border-primary bg-primary/5 shadow-sm'
+                                : 'border-border/50 hover:border-primary/30 hover:bg-muted/30'
+                            }`}
+                        >
+                            <h3 className={`font-serif font-bold ${settings.ttsProvider === 'kokoro' ? 'text-primary' : 'text-foreground'}`}>Kokoro AI</h3>
+                            <p className="text-xs text-muted-foreground leading-relaxed">
+                                Voix IA gratuites et naturelles. Idéal pour de longues sessions de lecture.
+                            </p>
+                        </button>
+
+                        {/* ElevenLabs TTS */}
+                        <button
+                            onClick={() => updateSettings({ ttsProvider: 'elevenlabs' })}
+                            className={`flex flex-col gap-2 p-5 rounded-2xl border-2 transition-all duration-200 text-left ${settings.ttsProvider === 'elevenlabs'
+                                ? 'border-primary bg-primary/5 shadow-sm'
+                                : 'border-border/50 hover:border-primary/30 hover:bg-muted/30'
+                            }`}
+                        >
+                            <h3 className={`font-serif font-bold ${settings.ttsProvider === 'elevenlabs' ? 'text-primary' : 'text-foreground'}`}>ElevenLabs</h3>
+                            <p className="text-xs text-muted-foreground leading-relaxed">
+                                Voix ultra-réalistes premium. Nécessite une configuration web.
+                            </p>
+                        </button>
+                    </div>
+                </section>
+
                 {/* TTS Provider Info */}
                 <section className="bg-foreground text-background rounded-3xl p-6 md:p-8 relative overflow-hidden">
                     <div className="absolute top-0 right-0 w-40 h-40 bg-primary/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
-                    <div className="relative z-10 flex items-start gap-4">
-                        <div className="w-12 h-12 bg-primary rounded-2xl flex items-center justify-center shrink-0">
-                            <Sparkles className="w-6 h-6 text-white" />
+                    <div className="relative z-10 flex flex-col md:flex-row items-center gap-6">
+                        <div className="flex items-center gap-4 flex-1">
+                            <div className="w-12 h-12 bg-primary rounded-2xl flex items-center justify-center shrink-0">
+                                <Sparkles className="w-6 h-6 text-white" />
+                            </div>
+                            <div>
+                                <h3 className="font-serif font-bold text-xl mb-1 text-background">
+                                    Moteur sélectionné : {settings.ttsProvider === 'elevenlabs' ? 'ElevenLabs' : settings.ttsProvider === 'kokoro' ? 'Kokoro AI' : 'Système'}
+                                </h3>
+                                <p className="text-background/70 text-sm leading-relaxed">
+                                    {settings.ttsProvider === 'elevenlabs' 
+                                        ? "Voix IA premium disponible dans le lecteur. Configurez vos préférences ElevenLabs depuis les contrôles audio pendant la lecture."
+                                        : settings.ttsProvider === 'kokoro'
+                                        ? 'Voix IA libres de haute qualité. Les temps de réponse peuvent varier selon la charge des serveurs Hugging Face.'
+                                        : 'Les voix varient selon votre système d\'exploitation (Windows, macOS, iOS, Android).'
+                                    }
+                                </p>
+                            </div>
                         </div>
-                        <div>
-                            <h3 className="font-serif font-bold text-xl mb-2">ElevenLabs AI</h3>
-                            <p className="text-background/70 text-sm leading-relaxed mb-4">
-                                Voix IA premium disponible dans le lecteur. Configurez vos préférences ElevenLabs directement depuis les contrôles audio pendant la lecture.
-                            </p>
-                            <span className="inline-flex items-center gap-2 text-xs font-bold text-primary bg-primary/20 px-3 py-1.5 rounded-full">
-                                <span className="w-2 h-2 bg-primary rounded-full animate-pulse"></span>
-                                Configuré via le lecteur
+                        <div className="shrink-0 text-right">
+                            <span className="inline-flex flex-col md:items-end gap-1">
+                                <span className="inline-flex items-center gap-2 text-xs font-bold text-primary bg-primary/20 px-3 py-1.5 rounded-full">
+                                    <span className="w-2 h-2 bg-primary rounded-full animate-pulse"></span>
+                                    {settings.ttsProvider === 'browser' ? 'Actif hors-ligne' : 'Connecté via le lecteur'}
+                                </span>
                             </span>
                         </div>
                     </div>

@@ -183,7 +183,7 @@ export function SettingsModal({
                                     <select
                                         value={selectedKokoroVoice?.id || ""}
                                         onChange={(e) => onKokoroVoiceChange(e.target.value)}
-                                        className="w-full p-3 rounded-2xl bg-emerald-500/5 dark:bg-emerald-500/10 text-sm outline-none focus:ring-2 focus:ring-emerald-500/30 border border-emerald-500/20 dark:border-emerald-500/30 focus:border-emerald-500/50 transition-all text-foreground"
+                                        className="w-full p-3 rounded-2xl bg-primary/5 dark:bg-primary/10 text-sm outline-none focus:ring-2 focus:ring-primary/30 border border-primary/20 dark:border-primary/30 focus:border-primary/50 transition-all text-foreground"
                                     >
                                         {kokoroVoices.map(v => (
                                             <option key={v.id} value={v.id}>
@@ -222,12 +222,12 @@ export function SettingsModal({
                                         <div className="space-y-2">
                                             <div className="flex items-center justify-between">
                                                 <label className="text-xs font-medium text-stone-500 dark:text-stone-400">Ton</label>
-                                                <span className="text-xs font-bold text-blue-500 bg-blue-500/10 px-2 py-0.5 rounded-md">{pitch}</span>
+                                                <span className="text-xs font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-md">{pitch}</span>
                                             </div>
                                             <input
                                                 type="range" min="0.5" max="2" step="0.1" value={pitch}
                                                 onChange={(e) => onPitchChange(parseFloat(e.target.value))}
-                                                className="w-full h-1.5 bg-muted rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:bg-blue-500"
+                                                className="w-full h-1.5 bg-muted rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:bg-primary"
                                             />
                                         </div>
                                     </div>
@@ -236,18 +236,18 @@ export function SettingsModal({
                                         <div className="space-y-2">
                                             <div className="flex items-center justify-between">
                                                 <label className="text-xs font-medium text-muted-foreground">Vitesse</label>
-                                                <span className="text-xs font-bold text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded-md">{rate}×</span>
+                                                <span className="text-xs font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-md">{rate}×</span>
                                             </div>
                                             <input
                                                 type="range" min="0.5" max="2" step="0.1" value={rate}
                                                 onChange={(e) => onRateChange(parseFloat(e.target.value))}
-                                                className="w-full h-1.5 bg-emerald-500/10 dark:bg-emerald-500/20 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:bg-emerald-500"
+                                                className="w-full h-1.5 bg-primary/10 dark:bg-primary/20 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:bg-primary"
                                             />
                                         </div>
-                                        <div className="p-3 rounded-xl bg-emerald-500/5 border border-emerald-500/20">
-                                            <p className="text-xs text-emerald-600 dark:text-emerald-400">
+                                        <div className="p-3 rounded-xl bg-primary/5 border border-primary/20">
+                                            <p className="text-xs text-primary/80 dark:text-primary/70">
                                                 🎯 <strong>Kokoro</strong> est un modèle TTS open-source gratuit avec qualité IA.
-                                                <span className="block mt-1 text-emerald-500/70">⚠️ Service externe (HuggingFace) - peut être lent ou indisponible</span>
+                                                <span className="block mt-1 text-primary/60">⚠️ Service externe (HuggingFace) - peut être lent ou indisponible</span>
                                             </p>
                                         </div>
                                     </div>

@@ -8,7 +8,7 @@ export function AudioWaveform({ isPlaying }: { isPlaying: boolean }) {
                     key={i}
                     className="w-[3px] rounded-full bg-gradient-to-t from-primary to-primary/60"
                     animate={isPlaying ? {
-                        height: ['4px', `${8 + Math.random() * 10}px`, '4px'],
+                        height: ['4px', `${8 + ((i * 7) % 10)}px`, '4px'],
                     } : { height: '4px' }}
                     transition={isPlaying ? {
                         repeat: Infinity,
